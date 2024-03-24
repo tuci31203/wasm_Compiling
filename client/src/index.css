@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.bottomPart {
+  background-image: linear-gradient(30deg,
+      hsl(272deg 97% 26%) 0%,
+      hsl(271deg 100% 24%) -1%,
+      hsl(269deg 100% 23%) -1%,
+      hsl(268deg 100% 22%) -2%,
+      hsl(265deg 100% 21%) -1%,
+      hsl(263deg 100% 20%) 0%,
+      hsl(260deg 100% 19%) 3%,
+      hsl(257deg 100% 18%) 10%,
+      hsl(254deg 100% 17%) 22%,
+      hsl(0deg 0% 0%) 67%);
+}
+
+.txtarea {
+  position: relative;
+
+}
+
+.icon {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  top: 8px;
+  right: 8px;
+  fill: rgba(99, 99, 99, 0.349);
+  transition: width 200ms ease-in-out;
+  transition: height 200ms ease-in-out;
+}
+
+.icon:hover {
+  fill: rgb(85, 85, 85);
+  cursor: pointer;
+}
+
+.icon:active {
+  fill: red;
+  width: 30px;
+  height: 30px;
+  transition: width 200ms ease-in-out;
+  transition: height 200ms ease-in-out;
+}
+
+textarea {
+  resize: none;
+}

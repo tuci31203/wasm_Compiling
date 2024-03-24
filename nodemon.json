@@ -1,0 +1,8 @@
+{
+    "ignore": [
+        "output.html",
+        "output.js",
+        "output.wasm",
+        "temp.cpp"
+    ]
+}
