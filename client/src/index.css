@@ -30,6 +30,24 @@
       hsl(0deg 0% 0%) 67%);
 }
 
+.bottomPartLight {
+  background:
+    radial-gradient(50% 50% at 100% 0, #ffffff 0% 5%, #e8f9ff 6% 15%, #ffffff 16% 25%, #e8f9ff 26% 35%, #ffffff 36% 45%,
+      #e8f9ff 46% 55%, #ffffff 56% 65%, #e8f9ff 66% 75%, #ffffff 76% 85%, #e8f9ff 86% 95%,
+      #0000 96%),
+    radial-gradient(50% 50% at 0 100%, #ffffff 0% 5%, #e8f9ff 6% 15%, #ffffff 16% 25%, #e8f9ff 26% 35%, #ffffff 36% 45%,
+      #e8f9ff 46% 55%, #ffffff 56% 65%, #e8f9ff 66% 75%, #ffffff 76% 85%, #e8f9ff 86% 95%,
+      #0000 96%),
+    radial-gradient(50% 50%, #ffffff 0% 5%, #e8f9ff 6% 15%, #ffffff 16% 25%, #e8f9ff 26% 35%, #ffffff 36% 45%,
+      #e8f9ff 46% 55%, #ffffff 56% 65%, #e8f9ff 66% 75%, #ffffff 76% 85%, #e8f9ff 86% 95%,
+      #0000 96%),
+    radial-gradient(50% 50%, #ffffff 0% 5%, #e8f9ff 6% 15%, #ffffff 16% 25%, #e8f9ff 26% 35%, #ffffff 36% 45%,
+      #e8f9ff 46% 55%, #ffffff 56% 65%, #e8f9ff 66% 75%, #ffffff 76% 85%, #e8f9ff 86% 95%,
+      #0000 96%) 25px 25px;
+  background-size: 50px 50px;
+  background-color: #ffffff;
+}
+
 .txtarea {
   position: relative;
 
@@ -61,4 +79,15 @@
 
 textarea {
   resize: none;
+}
+
+.topPart {
+  position: relative;
+}
+
+.light {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  fill: rgb(190, 190, 190);
 }

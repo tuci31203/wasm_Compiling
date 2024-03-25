@@ -26,3 +26,6 @@ dist-ssr
 
 *.wasm
 *.cpp
+
+nhapWoutEn.js
+test.js

@@ -3,12 +3,12 @@ import Message from "./components/Message"
 import { Editor } from '@monaco-editor/react'
 import runWasm from './runWasm'
 import './index.css'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 
 
 const App = () => {
   const [compiled, setCompiled] = useState(false)
+  const [light, setLight] = useState(true)
   // const [code, setCode] = useState('')
   const editorRef = useRef(null)
   const [inputValue, setInput] = useState('')
@@ -69,31 +69,35 @@ const App = () => {
 
   return (
     <>
-      <div className="bg-black" style={{ height: '60dvh' }} >
+      <div className={`${light ? "bg-white" : "bg-black"} h-[100dvh]`} >
 
-        <Editor
+        <div className="h-[60dvh] topPart">
+          <Editor
+            height="100%"
+            width="100%"
+            className='editor'
+            // className='shadow-md shadow-purple-900'
+            language="cpp"
+            theme={light ? "vs" : "vs-dark"}
+            onMount={handleEditorDidMount}
+            options={{
+              inlineSuggest: true,
+              fontSize: "16px",
+              formatOnType: true,
+              autoClosingBrackets: true,
+              minimap: { scale: 1 }
+            }}
+          />
+          <svg onClick={() => setLight(light => !light)} className="light w-[25px] h-[25px] hover:w-[30px] hover:h-[30px] hover:cursor-pointer hover:fill-yellow-400 hover: active:animate-spin active:fill-orange-500 transition-all" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z" /></svg>
 
-          height="100%"
-          width="100%"
-          // className='shadow-md shadow-purple-900'
-          language="cpp"
-          theme="vs-dark"
-          onMount={handleEditorDidMount}
-          options={{
-            inlineSuggest: true,
-            fontSize: "16px",
-            formatOnType: true,
-            autoClosingBrackets: true,
-            minimap: { scale: 1 }
-          }}
-        />
+        </div>
         {/* <textarea value={code} onChange={(e) => setCode(e.target.value)} cols="30" rows="10"></textarea> */}
 
 
 
 
 
-        <div className="bottomPart pl-4 flex gap-4 bg-white" style={{ height: '40dvh' }} >
+        <div className={`${light ? "bottomPartLight" : "bottomPart"} pl-4 flex gap-4`} style={{ height: '40dvh' }} >
           <div className="BtnNMs flex-1 flex flex-col justify-center gap-5">
 
             <div className="buttons flex gap-4 items-center flex-wrap">
@@ -124,23 +128,17 @@ const App = () => {
                 onClick={() => setInput('')}
                 className='w-10 h-10 icon' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" /></svg>
             </div>
-            {/* <Input value={inputValue} setInput={setInput} /> */}
+
 
           </div>
           <textarea
             readOnly
             value={output}
-            className="bg-black flex-1 w-full text-white text-xl p-3 "
+            className={light ? "bg-white flex-1 w-full text-black border-[3px] border-blue-200 rounded-lg text-xl p-3 shadow-lg shadow-purple-400" : "bg-black flex-1 w-full text-white text-xl p-3"}
             name="output" id="output" rows="14"></textarea>
 
         </div>
 
-        {/* <textarea id="cppCode" rows="10" cols="80"></textarea>
-      <button id="compileButton">Compile</button>
-      <div id="compileMessage"></div>
-      <textarea id="inputValue" rows="10" cols="80"></textarea>
-      <button id="run">run</button>
-      <div id="result"></div> */}
       </div>
     </>
   )
