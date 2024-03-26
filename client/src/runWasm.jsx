@@ -187,7 +187,6 @@ const runWasm = ({ inputValue, setOutput }) => {
                 // Prefer to use print/printErr where they exist, as they usually work better.
                 if (typeof console == 'undefined') console = /** @type{!Console} */({});
                 console.log = /** @type{!function(this:Console, ...*): undefined} */ (print);
-                // document.getElementById('result').textContent = (print)
                 console.warn = console.error = /** @type{!function(this:Console, ...*): undefined} */ (typeof printErr != 'undefined' ? printErr : print);
             }
 
@@ -1040,6 +1039,91 @@ const runWasm = ({ inputValue, setOutput }) => {
         }
     };
 
+    class ExceptionInfo {
+        // excPtr - Thrown object pointer to wrap. Metadata pointer is calculated from it.
+        constructor(excPtr) {
+            this.excPtr = excPtr;
+            this.ptr = excPtr - 24;
+        }
+
+        set_type(type) {
+            HEAPU32[(((this.ptr) + (4)) >> 2)] = type;
+        }
+
+        get_type() {
+            return HEAPU32[(((this.ptr) + (4)) >> 2)];
+        }
+
+        set_destructor(destructor) {
+            HEAPU32[(((this.ptr) + (8)) >> 2)] = destructor;
+        }
+
+        get_destructor() {
+            return HEAPU32[(((this.ptr) + (8)) >> 2)];
+        }
+
+        set_caught(caught) {
+            caught = caught ? 1 : 0;
+            HEAP8[(this.ptr) + (12)] = caught;
+        }
+
+        get_caught() {
+            return HEAP8[(this.ptr) + (12)] != 0;
+        }
+
+        set_rethrown(rethrown) {
+            rethrown = rethrown ? 1 : 0;
+            HEAP8[(this.ptr) + (13)] = rethrown;
+        }
+
+        get_rethrown() {
+            return HEAP8[(this.ptr) + (13)] != 0;
+        }
+
+        // Initialize native structure fields. Should be called once after allocated.
+        init(type, destructor) {
+            this.set_adjusted_ptr(0);
+            this.set_type(type);
+            this.set_destructor(destructor);
+        }
+
+        set_adjusted_ptr(adjustedPtr) {
+            HEAPU32[(((this.ptr) + (16)) >> 2)] = adjustedPtr;
+        }
+
+        get_adjusted_ptr() {
+            return HEAPU32[(((this.ptr) + (16)) >> 2)];
+        }
+
+        // Get pointer which is expected to be received by catch clause in C++ code. It may be adjusted
+        // when the pointer is casted to some of the exception object base classes (e.g. when virtual
+        // inheritance is used). When a pointer is thrown this method should return the thrown pointer
+        // itself.
+        get_exception_ptr() {
+            // Work around a fastcomp bug, this code is still included for some reason in a build without
+            // exceptions support.
+            var isPointer = ___cxa_is_pointer_type(this.get_type());
+            if (isPointer) {
+                return HEAPU32[((this.excPtr) >> 2)];
+            }
+            var adjusted = this.get_adjusted_ptr();
+            if (adjusted !== 0) return adjusted;
+            return this.excPtr;
+        }
+    }
+
+    var exceptionLast = 0;
+
+    var uncaughtExceptionCount = 0;
+    var ___cxa_throw = (ptr, type, destructor) => {
+        var info = new ExceptionInfo(ptr);
+        // Initialize ExceptionInfo content after it was allocated in __cxa_allocate_exception.
+        info.init(type, destructor);
+        exceptionLast = ptr;
+        uncaughtExceptionCount++;
+        assert(false, 'Exception thrown, but exception catching is not enabled. Compile with -sNO_DISABLE_EXCEPTION_CATCHING or -sEXCEPTION_CATCHING_ALLOWED=[..] to catch.');
+    };
+
     var _abort = () => {
         abort('native code called abort()');
     };
@@ -1451,7 +1535,7 @@ const runWasm = ({ inputValue, setOutput }) => {
                 if (typeof window != 'undefined' &&
                     typeof window.prompt == 'function') {
                     // Browser.
-                    result = inputValue  // returns null on cancel
+                    result = inputValue   // returns null on cancel
                     if (result !== null) {
                         result += '\n';
                     }
@@ -1559,6 +1643,8 @@ const runWasm = ({ inputValue, setOutput }) => {
             },
             put_char(tty, val) {
                 if (val === null || val === 10) {
+                    const kqua = UTF8ArrayToString(tty.output, 0)
+                    setOutput(prev => prev + kqua + "\n")
                     out(UTF8ArrayToString(tty.output, 0));
                     tty.output = [];
                 } else {
@@ -1567,11 +1653,10 @@ const runWasm = ({ inputValue, setOutput }) => {
             },
             fsync(tty) {
                 if (tty.output && tty.output.length > 0) {
-                    // document.getElementById('result').textContent = UTF8ArrayToString(tty.output, 0);
-                    setOutput(UTF8ArrayToString(tty.output, 0));
+                    const kquane = UTF8ArrayToString(tty.output, 0)
+                    setOutput(prev => prev + kquane)
                     out(UTF8ArrayToString(tty.output, 0));
                     tty.output = [];
-                    // return UTF8ArrayToString(tty.output, 0);
                 }
             },
             ioctl_tcgets(tty) {
@@ -4437,16 +4522,9 @@ const runWasm = ({ inputValue, setOutput }) => {
     function checkIncomingModuleAPI() {
         ignoredModuleProp('fetchSettings');
     }
-
-    function memory_grow(pagesToAdd) {
-        const memory = new WebAssembly.Memory({ initial: 1, maximum: 10 });
-        const previousPages = memory.buffer.byteLength / (64 * 1024); // Convert memory size to pages
-        const result = memory.grow(pagesToAdd);
-        const newPages = memory.buffer.byteLength / (64 * 1024); // Convert memory size to pages
-        return newPages - previousPages; // Return the number of pages added
-    }
-
     var wasmImports = {
+        /** @export */
+        __cxa_throw: ___cxa_throw,
         /** @export */
         abort: _abort,
         /** @export */
@@ -4481,6 +4559,7 @@ const runWasm = ({ inputValue, setOutput }) => {
     var stackRestore = createExportWrapper('stackRestore');
     var stackAlloc = createExportWrapper('stackAlloc');
     var _emscripten_stack_get_current = () => (_emscripten_stack_get_current = wasmExports['emscripten_stack_get_current'])();
+    var ___cxa_is_pointer_type = createExportWrapper('__cxa_is_pointer_type');
     var dynCall_viijii = Module['dynCall_viijii'] = createExportWrapper('dynCall_viijii');
     var dynCall_jiji = Module['dynCall_jiji'] = createExportWrapper('dynCall_jiji');
     var dynCall_iiiiij = Module['dynCall_iiiiij'] = createExportWrapper('dynCall_iiiiij');
@@ -4501,7 +4580,7 @@ const runWasm = ({ inputValue, setOutput }) => {
         'readI53FromU64',
         'convertI32PairToI53',
         'convertU32PairToI53',
-        // 'growMemory',
+        'growMemory',
         'ydayFromDate',
         'inetPton4',
         'inetNtop4',
@@ -4613,7 +4692,6 @@ const runWasm = ({ inputValue, setOutput }) => {
         'makePromise',
         'idsToPromises',
         'makePromiseCallback',
-        'ExceptionInfo',
         'findMatchingCatch',
         'Browser_asyncPrepareDataCounter',
         'setMainLoop',
@@ -4741,6 +4819,7 @@ const runWasm = ({ inputValue, setOutput }) => {
         'uncaughtExceptionCount',
         'exceptionLast',
         'exceptionCaught',
+        'ExceptionInfo',
         'Browser',
         'getPreloadedImageData__data',
         'wget',
@@ -4772,6 +4851,8 @@ const runWasm = ({ inputValue, setOutput }) => {
         'allocateUTF8OnStack',
     ];
     unexportedSymbols.forEach(unexportedRuntimeSymbol);
+
+
 
     var calledRun;
 
@@ -4812,15 +4893,6 @@ const runWasm = ({ inputValue, setOutput }) => {
         writeStackCookie();
     }
 
-
-    if (Module['preInit']) {
-        if (typeof Module['preInit'] == 'function') Module['preInit'] = [Module['preInit']];
-        while (Module['preInit'].length > 0) {
-            Module['preInit'].pop()();
-        }
-    }
-
-    // shouldRunNow refers to calling main(), not run().
     function run() {
 
         if (runDependencies > 0) {
@@ -4870,6 +4942,14 @@ const runWasm = ({ inputValue, setOutput }) => {
         checkStackCookie();
     }
 
+    if (Module['preInit']) {
+        if (typeof Module['preInit'] == 'function') Module['preInit'] = [Module['preInit']];
+        while (Module['preInit'].length > 0) {
+            Module['preInit'].pop()();
+        }
+    }
+
+    // shouldRunNow refers to calling main(), not run().
     var shouldRunNow = true;
 
     if (Module['noInitialRun']) shouldRunNow = false;
