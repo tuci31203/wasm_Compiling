@@ -21,7 +21,7 @@
 - [Authors](#authors)
 - [Acknowledgments](#acknowledgement)
 
-## 🧐 About <a name = "about"></a>
+## ✨ About <a name = "about"></a>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The main purpose of the project is to utilize Emscripten toolchains to understand how to get wasm working in browser. Specifically, I used Emscripten `emcc` to compile C++ code to WebAssembly and learn to make use of the 'glue code' in order to execute wasm files on website.
 
@@ -38,13 +38,36 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
+Check if Node is installed in your device with terminal command
+
+```bash
+node --version
+```
+
+
+### Installing
+
 You will need to clone the project to your local remote.
 
-```
+```bash
 git clone https://github.com/...
 ```
 
-### Installing
+Initialize node in root folder
+```bash
+npm init
+```
+
+Inside folder `clients` you will need to create a Vite project
+
+```bash
+npm create vite@latest
+```
+
+Check for packages needed in all `package.json` and `npm install` them accordingly.
+
+
+## 🎈 Usage <a name="usage"></a>
 
 Get the server running from the main folder with the following command
 
@@ -59,8 +82,7 @@ and get the application running in the client folder with
 npm run dev
 ```
 
-
-## 🎈 Usage <a name="usage"></a>
+#### Guidelines:
 
 + **Step 1:** Code some C/C++ lines to the Editor part.
 
