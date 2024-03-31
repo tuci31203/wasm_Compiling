@@ -72,7 +72,7 @@ const App = () => {
     <>
       <div className={`${light ? "bg-white" : "bg-black"} h-[100dvh]`} >
 
-        <div className="h-[60dvh] topPart">
+        <div className="h-[59dvh] topPart">
           <Editor
             height="100%"
             width="100%"
@@ -99,7 +99,7 @@ const App = () => {
 
 
         <div className={`${light ? "bottomPartLight" : "bottomPart"} pl-4 flex gap-4 sm:h-[40dvh]`} >
-          <div className="BtnNMs flex-1 flex flex-col justify-center gap-5">
+          <div className="BtnNMs flex-1 flex flex-col justify-center gap-5 h-full">
 
             <div className="buttons flex gap-4 items-center flex-wrap">
               <div
@@ -117,13 +117,13 @@ const App = () => {
 
               <Message message={message.message} type={message.type} />
             </div>
-            <div className="txtarea">
+            <div className="txtarea h-full">
               <textarea
                 value={inputValue}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Input"
-                className="rounded-lg w-full ring ring-blue-200 p-2.5 shadow-lg shadow-purple-400"
-                name="input" id="input" rows="10">
+                className="rounded-lg w-full ring ring-blue-200 p-2.5 shadow-lg shadow-purple-400 h-full"
+                id="input" >
               </textarea>
               <svg
                 onClick={() => setInput('')}
@@ -135,8 +135,8 @@ const App = () => {
           <textarea
             readOnly
             value={output}
-            className={light ? "bg-white flex-1 w-full text-black border-[3px] border-blue-200 rounded-lg text-xl p-3 shadow-lg shadow-purple-400" : "bg-black flex-1 w-full text-white text-xl p-3"}
-            name="output" id="output" rows="14"></textarea>
+            className={`${light ? "bg-white flex-1 w-full text-black border-[3px] border-blue-200 rounded-lg text-xl p-3 shadow-lg shadow-purple-400" : "bg-black flex-1 w-full text-white text-xl p-3"} h-full`}
+            id="output" ></textarea>
 
         </div>
 

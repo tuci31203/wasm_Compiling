@@ -26,7 +26,7 @@ app.post('/api/compile', (req, res) => {
 
         // Compile C++ code using emcc
         // exec(`emcc ${tempCppFile} -o public/output.js -s EXIT_RUNTIME=1`, (error, stdout, stderr) => {
-        exec(`emcc ${tempCppFile} -o client/public/output.js -s EXIT_RUNTIME=1`, (error, stdout, stderr) => {
+        exec(`emcc ${tempCppFile} -o client/public/output.js -s EXIT_RUNTIME=1 -s INITIAL_MEMORY=4000MB -s ALLOW_MEMORY_GROWTH=1`, (error, stdout, stderr) => {
             // exec(`emcc ${tempCppFile} -o public/output.wasm -s WASM=1 -s SIDE_MODULE=1 -std=c++17 -O3`, (error, stdout, stderr) => {
             // exec(`emcc ${tempCppFile} -o public/output.wasm -s WASM=1 -s SIDE_MODULE=1 -std=c++17 -O3 -s EXPORTED_FUNCTIONS="['_main']" -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s ENVIRONMENT=web`, (error, stdout, stderr) => {
             // Delete the temporary C++ file
