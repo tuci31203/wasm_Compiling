@@ -1,4 +1,4 @@
-const runWasm = ({ inputValue, setOutput }) => {
+const runWasm = ({ inputValue, setOutput, folder }) => {
     var Module = typeof Module != 'undefined' ? Module : {};
 
     // --pre-jses are emitted after the Module integration code, so that they can
@@ -695,7 +695,7 @@ const runWasm = ({ inputValue, setOutput }) => {
     // include: runtime_exceptions.js
     // end include: runtime_exceptions.js
     var wasmBinaryFile;
-    wasmBinaryFile = 'output.wasm';
+    wasmBinaryFile = `${folder}/output.wasm`;
     if (!isDataURI(wasmBinaryFile)) {
         wasmBinaryFile = locateFile(wasmBinaryFile);
     }

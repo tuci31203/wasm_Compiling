@@ -3,6 +3,7 @@ import Message from "./components/Message"
 import { Editor } from '@monaco-editor/react'
 import runWasm from './runWasm'
 import './index.css'
+import { genFolder } from './service/genFolder'
 
 
 
@@ -13,11 +14,20 @@ const App = () => {
   const editorRef = useRef(null)
   const [inputValue, setInput] = useState('')
   const [output, setOutput] = useState('')
+  const [folder, setFolder] = useState("")
   const defaultMess = {
     message: '✨✨✨',
     type: 0,
   }
   const [message, setMessage] = useState(defaultMess)
+
+  useEffect(() => {
+    if (!localStorage.getItem("folder")) {
+      const fld = genFolder()
+      localStorage.setItem("folder", fld)
+    }
+    setFolder(localStorage.getItem("folder"))
+  }, [])
 
   // useEffect(() => {
   //   setCompiled(false)
@@ -33,12 +43,16 @@ const App = () => {
     const code = editorRef.current.getValue()
     if (!code) return
     try {
-      const response = await fetch('http://localhost:3000/api/compile', {
+      const response = await fetch('api/compile', {
         method: 'POST',
         headers: {
-          'Content-Type': 'text/plain'
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'text/plain'
         },
-        body: code
+        body: JSON.stringify({
+          code: code,
+          folder: folder
+        })
       })
       const data = await response.json()
       console.log(data.EM)
@@ -58,7 +72,7 @@ const App = () => {
   const handleRun = (e) => {
     e.preventDefault()
     setOutput('')
-    if (compiled) { runWasm({ inputValue, setOutput }) }
+    if (compiled) { runWasm({ inputValue, setOutput, folder }) }
 
   }
 
@@ -98,7 +112,7 @@ const App = () => {
 
 
 
-        <div className={`${light ? "bottomPartLight" : "bottomPart"} pl-4 flex gap-4 sm:h-[40dvh]`} >
+        <div className={`${light ? "bottomPartLight" : "bottomPart"} px-2 flex gap-4 h-[40%] sm:h-[40dvh]`} >
           <div className="BtnNMs flex-1 flex flex-col justify-center gap-5 h-full">
 
             <div className="buttons flex gap-4 items-center flex-wrap">
